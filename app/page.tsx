@@ -13,19 +13,21 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Input } from "@/components/ui/input";
 import analyzeAnime from "./actions/anime";
 import analyzeGithub from "./actions/github";
+import analyzeLeetCode from "./actions/leetcode";
 
 export enum Tone{
   summarise="summarise",
   evaluate="evaluate",
   guide="guide",
-  criticism="criticism",
+  criticism="construcutive_criticism",
   roast="roast"
 }
 
 export enum Mode{
   // spotify="spotify",
+  github="github",
   anime="anime",
-  github="github"
+  leetcode="leetcode"
 }
 
 export default function Home() {
@@ -55,13 +57,13 @@ export default function Home() {
       </Button> */}
       
       <ToggleGroup type="single" onValueChange={value => setMode(value as Mode)} defaultValue={Mode.github}>
-        <ToggleGroupItem value={Mode.github}>Github</ToggleGroupItem>
-        <ToggleGroupItem value={Mode.anime}>Anime</ToggleGroupItem>
-        {/* {Object.values(Mode).map((mode)=>{
+        {/* <ToggleGroupItem value={Mode.github}>Github</ToggleGroupItem>
+        <ToggleGroupItem value={Mode.anime}>Anime</ToggleGroupItem> */}
+        {Object.values(Mode).map((mode)=>{
           return <ToggleGroupItem key={mode} value={mode}>
             {mode.charAt(0).toUpperCase()+ mode.slice(1)}  
           </ToggleGroupItem>
-        })} */}
+        })}
       </ToggleGroup>
                 <Select onValueChange={(value) => setTone(value as Tone)}>
         <SelectTrigger>
@@ -96,7 +98,7 @@ export default function Home() {
           
         ) : mode===Mode.anime ? (
         <div>
-          <Input onChange={(e) => setUsername(e.target.value)} placeholder="Enter your MAL username" />
+          <Input onChange={(e) => setUsername(e.target.value)} placeholder="Enter your MyAnimeList username" />
           <Button
             disabled={!username || !tone}
             onClick={async () => {
@@ -111,7 +113,22 @@ export default function Home() {
             Critique my anime
           </Button>
         </div>
-      ): null}
+      ): mode===Mode.leetcode?(
+        <div>
+          <Input onChange={(e)=>setUsername(e.target.value)} placeholder="Enter your Leetcode username" />
+          <Button disabled={!username || !tone}
+          onClick={async ()=>{
+            try{
+              const res=await analyzeLeetCode({username,tone:tone!});
+              toast.success(res);
+            }catch(error){
+              toast.error("error generating resposnse");
+            }
+          }}>
+            Critique my Leetcode
+          </Button>
+        </div>
+      ):null}
     </div>
   );
 }

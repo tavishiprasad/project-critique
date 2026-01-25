@@ -23,7 +23,7 @@ const generateResponse = async (data: string, tone: string) => {
     1. A single paragraph of feedback adhering to the specified tone.
     2. The feedback should only be about 5-6 sentences long.
     3. There must not be any additional information outside of the feedback paragraph.
-    4. There must be no line breaks, bullet points, or enumerations.
+    4. There must be no line breaks, dashes, bullet points, or enumerations.
     `;
     
     try {
