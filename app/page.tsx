@@ -21,6 +21,8 @@ import FireBackground from "@/components/roastBackground";
 import EvaluateBackground from "@/components/evaluateBackground";
 import GuideBackground from "@/components/guideBackground";
 import CritiqueModal from "@/components/critiqueModal";
+import analyzeResume from "./actions/resume";
+import { resume } from "react-dom/server";
 
 export enum Tone {
   summarise = "summarise",
@@ -35,6 +37,7 @@ export enum Mode {
   github = "github",
   anime = "anime",
   leetcode = "leetcode",
+  resume="resume",
 }
 
 const containerVariants: Variants = {
@@ -71,6 +74,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [critiqueResult, setCritiqueResult]=useState("");
   const [showDialog, setShowDialog]=useState(false);
+  const [resumeFile, setResumeFile]=useState<File|null>(null);
+  const [resumeUrl,setResumeUrl]=useState("");
 
   useEffect(() => {
     setUsername("");
@@ -292,7 +297,43 @@ export default function Home() {
                   {isLoading ? "Critiquing..." : "Critique my LeetCode"}
                 </Button>
               </>
-            ) : null}
+            ) : mode===Mode.resume?(
+              <>
+                <Input 
+                className="w-62.5"
+                type="file" 
+                accept="application/pdf" 
+                onChange={(e)=>setResumeFile(e.target.files?.[0] ||null)} 
+                placeholder="Select Resume File"
+                />
+                <Input 
+                className="w-62.5"
+                placeholder="Or paste resume Url"
+                value={resumeUrl} 
+                onChange={(e)=>setResumeUrl(e.target.value)}
+                />
+                <Button
+                  disabled={(!resumeFile && !resumeUrl)|| !tone || isLoading }
+                  onClick={async()=>{
+                    setIsLoading(true);
+                    try{
+                      const res=await analyzeResume({
+                        file:resumeFile || undefined,
+                        url:resumeFile?undefined:resumeUrl,
+                        tone:tone!,
+                      });
+                      handleSuccess(res);
+                    }catch(_error){
+                      toast.error("Failed to analyze resume");
+                    }finally{
+                      setIsLoading(false);
+                    }
+                  }}
+                >
+                  Analyze Resume
+                </Button>
+              </>
+            ):null}
           </motion.div>
         </AnimatePresence>
       </div>
