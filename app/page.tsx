@@ -23,6 +23,7 @@ import GuideBackground from "@/components/guideBackground";
 import CritiqueModal from "@/components/critiqueModal";
 import analyzeResume from "./actions/resume";
 import { resume } from "react-dom/server";
+import analyzeCodeforces from "./actions/codeforces";
 
 export enum Tone {
   summarise = "summarise",
@@ -37,6 +38,7 @@ export enum Mode {
   github = "github",
   anime = "anime",
   leetcode = "leetcode",
+  codeforces="codeforces",
   resume="resume",
 }
 
@@ -297,7 +299,34 @@ export default function Home() {
                   {isLoading ? "Critiquing..." : "Critique my LeetCode"}
                 </Button>
               </>
-            ) : mode===Mode.resume?(
+            ) : mode === Mode.codeforces ? (
+              <>
+                <Input
+                  className="w-62.5"
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your Codeforces username"
+                />
+                <Button
+                  disabled={!username || !tone || isLoading}
+                  onClick={async () => {
+                    try {
+                      setIsLoading(true);
+                      const res = await analyzeCodeforces({
+                        username,
+                        tone: tone!,
+                      });
+                      handleSuccess(res);
+                    } catch (_error) {
+                      toast.error("error generating resposnse");
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                >
+                  {isLoading ? "Critiquing..." : "Critique my Codeforces"}
+                </Button>
+              </>
+              ) : mode===Mode.resume?(
               <>
                 <Input 
                 className="w-62.5"
